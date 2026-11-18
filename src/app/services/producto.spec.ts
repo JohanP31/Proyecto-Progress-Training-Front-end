@@ -7,7 +7,8 @@ import { ProductoService } from './producto';
 describe('ProductoService', () => {
   let service: ProductoService;
   let http: HttpTestingController;
-  const url = `${environment.apiUrl}/productos`;
+  // El backend define la ruta con "/" al final
+  const url = `${environment.apiUrl}/productos/`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -19,39 +20,27 @@ describe('ProductoService', () => {
 
   afterEach(() => http.verify());
 
-  it('lista con GET /productos', () => {
+  it('lista con GET /productos/', () => {
     service.listar().subscribe();
     const req = http.expectOne(url);
     expect(req.request.method).toBe('GET');
     req.flush([]);
   });
 
-  it('obtiene con GET /productos/{id}', () => {
-    service.obtener(3).subscribe();
-    const req = http.expectOne(`${url}/3`);
-    expect(req.request.method).toBe('GET');
-    req.flush({});
-  });
-
-  it('crea con POST /productos', () => {
-    service.crear({ nombre: 'Mouse', precio: 10 }).subscribe();
+  it('crea con POST /productos/', () => {
+    const datos = { nombre: 'Whey', categoria: 'Proteína', precio_unitario: 120000, stock: 5 };
+    service.crear(datos).subscribe();
     const req = http.expectOne(url);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ nombre: 'Mouse', precio: 10 });
+    expect(req.request.body).toEqual(datos);
     req.flush({});
   });
 
-  it('actualiza con PUT /productos/{id}', () => {
-    service.actualizar(3, { stock: 5 }).subscribe();
-    const req = http.expectOne(`${url}/3`);
-    expect(req.request.method).toBe('PUT');
+  it('vende con POST /productos/ventas', () => {
+    service.vender({ producto_id: 3, cantidad: 2 }).subscribe();
+    const req = http.expectOne(`${url}ventas`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ producto_id: 3, cantidad: 2 });
     req.flush({});
-  });
-
-  it('elimina con DELETE /productos/{id}', () => {
-    service.eliminar(3).subscribe();
-    const req = http.expectOne(`${url}/3`);
-    expect(req.request.method).toBe('DELETE');
-    req.flush(null);
   });
 });

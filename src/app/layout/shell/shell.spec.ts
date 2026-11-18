@@ -22,7 +22,10 @@ describe('Shell', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display the user session', () => {
-    expect(component.userSession).toBe('johanbermudez1140463');
+  it('muestra las pantallas del MVP en el menú', () => {
+    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(texto).toContain('INGRESO');
+    expect(texto).toContain('CLIENTES');
+    expect(texto).toContain('MEMBRESÍAS');
   });
 });

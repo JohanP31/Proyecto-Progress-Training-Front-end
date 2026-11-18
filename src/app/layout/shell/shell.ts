@@ -9,12 +9,5 @@ import { RouterModule } from '@angular/router';
   templateUrl: './shell.html',
   styleUrls: ['./shell.css']
 })
-export class Shell {
-  // Simulación de usuario de sesión actual obtenido del backend / auth
-  userSession = 'johanbermudez1140463';
-
-  onLogout(): void {
-    // Lógica para cerrar sesión (limpiar token, redirigir al login, etc.)
-    console.log('Cerrando sesión...');
-  }
-}
+// Menú lateral. No muestra sesión porque el login no es parte del MVP.
+export class Shell {}

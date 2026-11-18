@@ -29,14 +29,7 @@
       </a>
     </nav>
   </div>
-
-  <div class="app-sidebar__footer">
-    <div class="app-sidebar__session-label">SESIÓN</div>
-    <div class="app-sidebar__session">{{ userSession }}</div>
-    <button type="button" class="app-sidebar__logout" (click)="onLogout()">
-      SALIR
-    </button>
-  </div>
+  <!-- Sin sesión: el login no es parte del MVP ("no cumple a la fecha") -->
 </aside>
 <main class="app-shell__content">
   <router-outlet />

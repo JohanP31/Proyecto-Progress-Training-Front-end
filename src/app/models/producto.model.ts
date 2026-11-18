@@ -1,16 +1,44 @@
+// Coincide con los schemas del backend (app/schemas/producto_schema.py)
+
+/** Venta de un producto. */
+export interface VentaProducto {
+  id: number;
+  fecha: string;
+  cantidad: number;
+  total: number;
+  producto_id: number;
+}
+
+/** Producto tal como lo devuelve GET /productos/. */
 export interface Producto {
   id: number;
   nombre: string;
-  descripcion: string | null;
-  precio: number;
+  categoria: string;
+  precio_unitario: number;
   stock: number;
-  activo: boolean;
+  ventas: VentaProducto[];
 }
 
-export type ProductoCreate = Omit<Producto, 'id' | 'descripcion' | 'stock' | 'activo'> & {
-  descripcion?: string | null;
-  stock?: number;
-  activo?: boolean;
-};
+/** Datos para crear un producto (POST /productos/). */
+export interface ProductoCreate {
+  nombre: string;
+  categoria: string;
+  precio_unitario: number;
+  stock: number;
+}
 
-export type ProductoUpdate = Partial<ProductoCreate>;
+/** Datos para vender (POST /productos/ventas). */
+export interface VentaCreate {
+  producto_id: number;
+  cantidad: number;
+}
+
+/** Respuesta de la venta. */
+export interface VentaResultado {
+  mensaje: string;
+  venta_id: number;
+  producto: string;
+  cantidad_vendida: number;
+  total_pagado: number;
+  stock_restante: number;
+}
