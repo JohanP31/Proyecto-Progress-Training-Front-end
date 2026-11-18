@@ -1,0 +1,34 @@
+<aside class="app-sidebar">
+  <div>
+    <div class="app-sidebar__brand">
+      <div class="app-sidebar__logo">PT</div>
+      <div class="app-sidebar__brand-name">
+        <span>Progress</span>
+        <span>training</span>
+      </div>
+    </div>
+
+    <nav class="app-sidebar__nav" aria-label="Navegación principal">
+      <a routerLink="/vendedores" routerLinkActive="is-active" class="app-sidebar__link">
+        VENDEDORES
+      </a>
+      <a routerLink="/productos" routerLinkActive="is-active" class="app-sidebar__link">
+        PRODUCTOS
+      </a>
+      <a routerLink="/inventario" routerLinkActive="is-active" class="app-sidebar__link">
+        INVENTARIO
+      </a>
+      <a routerLink="/clientes" routerLinkActive="is-active" class="app-sidebar__link">
+        CLIENTES
+      </a>
+    </nav>
+  </div>
+
+  <div class="app-sidebar__footer">
+    <div class="app-sidebar__session-label">SESIÓN</div>
+    <div class="app-sidebar__session">{{ userSession }}</div>
+    <button type="button" class="app-sidebar__logout" (click)="onLogout()">
+      SALIR
+    </button>
+  </div>
+</aside>
