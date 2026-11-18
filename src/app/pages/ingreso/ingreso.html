@@ -1,0 +1,62 @@
+<section class="pagina">
+  <header class="pagina__header">
+    <div>
+      <h1>Ingreso</h1>
+      <p>Registra la entrada de un cliente. Solo entra si su membresía está vigente.</p>
+    </div>
+  </header>
+
+  @if (error()) {
+    <p class="mensaje mensaje--error" role="alert">{{ error() }}</p>
+  }
+
+  <section class="tarjeta">
+    <h2>Registrar ingreso</h2>
+    <form #ingresoForm="ngForm" (ngSubmit)="registrar()">
+      <label for="cliente">Cliente</label>
+      <select id="cliente" [(ngModel)]="clienteId" name="cliente" required>
+        <option [ngValue]="null">— Elegir —</option>
+        @for (cliente of clientes(); track cliente.id) {
+          <option [ngValue]="cliente.id">{{ cliente.nombre }} ({{ cliente.documento }})</option>
+        }
+      </select>
+
+      <label for="empleado">Empleado que registra</label>
+      <select id="empleado" [(ngModel)]="empleadoId" name="empleado" required>
+        <option [ngValue]="null">— Elegir —</option>
+        @for (empleado of empleados(); track empleado.id) {
+          <option [ngValue]="empleado.id">{{ empleado.nombre }}</option>
+        }
+      </select>
+      @if (empleados().length === 0) {
+        <p class="texto-suave">No hay empleados. Créalos con POST /usuarios en Swagger.</p>
+      }
+
+      <div class="acciones-modal">
+        <button
+          type="submit"
+          class="boton-principal"
+          [disabled]="clienteId === null || empleadoId === null || registrando()"
+        >
+          {{ registrando() ? 'Validando…' : 'Registrar ingreso' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Resultado: HU-02 (permitido) o HU-03 (bloqueado) -->
+  @if (permitido(); as ingreso) {
+    <section class="resultado resultado--permitido" role="status">
+      <h2>✔ Ingreso permitido</h2>
+      <p>{{ nombreCliente(ingreso.cliente_id) }}</p>
+      <p>{{ ingreso.fecha_hora | date: 'dd/MM/yyyy hh:mm a' }} · {{ ingreso.tipo_ingreso }}</p>
+    </section>
+  }
+  @if (bloqueado()) {
+    <section class="resultado resultado--bloqueado" role="alert">
+      <h2>✖ Ingreso bloqueado</h2>
+      <p>{{ bloqueado() }}</p>
+      <p>El cliente debe renovar su membresía en la pantalla Membresías.</p>
+    </section>
+  }
+</section>
