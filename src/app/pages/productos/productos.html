@@ -2,24 +2,8 @@
   <header class="crud-barra">
     <div>
       <h2>Productos</h2>
-      <p>Administra el catálogo: precio, stock y estado de cada producto.</p>
+      <p>Catálogo de la tienda: precio, stock y venta de suplementos.</p>
     </div>
-
-    <form class="filtro" (ngSubmit)="buscarPorId()">
-      <label for="idFiltro">Buscar por ID</label>
-      <input
-        id="idFiltro"
-        [(ngModel)]="idFiltro"
-        name="idFiltro"
-        type="number"
-        min="1"
-        placeholder="ID del producto"
-      />
-      <button type="submit">Buscar</button>
-      <button type="button" class="boton-secundario" (click)="limpiarFiltro()">
-        Ver todos
-      </button>
-    </form>
 
     <button type="button" class="boton-crear" (click)="abrirCrear()">
       + Crear producto
@@ -36,10 +20,10 @@
         <tr>
           <th scope="col">ID</th>
           <th scope="col">Nombre</th>
-          <th scope="col">Descripción</th>
+          <th scope="col">Categoría</th>
           <th scope="col">Precio</th>
           <th scope="col">Stock</th>
-          <th scope="col">Estado</th>
+          <th scope="col">Ventas</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -48,25 +32,21 @@
           <tr>
             <td>{{ producto.id }}</td>
             <td>{{ producto.nombre }}</td>
-            <td>{{ producto.descripcion || '—' }}</td>
-            <td>{{ producto.precio }}</td>
-            <td>{{ producto.stock }}</td>
+            <td>{{ producto.categoria }}</td>
+            <td>${{ producto.precio_unitario | number: '1.0-2' }}</td>
             <td>
-              <span
-                class="estado"
-                [class.estado-inactivo]="!producto.activo"
-              >
-                {{ producto.activo ? 'Activo' : 'Inactivo' }}
+              <span class="estado" [class.estado-inactivo]="producto.stock === 0">
+                {{ producto.stock }}
               </span>
             </td>
+            <td>{{ producto.ventas.length }}</td>
             <td class="acciones">
-              <button type="button" (click)="abrirEditar(producto)">Editar</button>
               <button
                 type="button"
-                class="boton-eliminar"
-                (click)="eliminar(producto)"
+                [disabled]="producto.stock === 0"
+                (click)="abrirVender(producto)"
               >
-                Eliminar
+                Vender
               </button>
             </td>
           </tr>
@@ -80,7 +60,7 @@
   </div>
 </section>
 
-@if (popupAbierto()) {
+@if (popup(); as tipo) {
   <div class="fondo-popup" (click)="cerrarPopup()">
     <section
       class="popup"
@@ -90,79 +70,103 @@
       (click)="$event.stopPropagation()"
     >
       <h3 id="titulo-formulario">
-        {{ modo() === 'crear' ? 'Crear producto' : 'Editar producto' }}
+        {{ tipo === 'crear' ? 'Crear producto' : 'Vender ' + productoVenta?.nombre }}
       </h3>
 
       @if (errorPopup()) {
         <p class="mensaje" role="alert">{{ errorPopup() }}</p>
       }
 
-      <form #productoForm="ngForm" (ngSubmit)="guardar()">
-        <label for="nombre">Nombre</label>
-        <input
-          id="nombre"
-          [(ngModel)]="formulario.nombre"
-          name="nombre"
-          type="text"
-          maxlength="100"
-          required
-        />
-
-        <label for="descripcion">Descripción <span>(opcional)</span></label>
-        <input
-          id="descripcion"
-          [(ngModel)]="formulario.descripcion"
-          name="descripcion"
-          type="text"
-          maxlength="255"
-        />
-
-        <label for="precio">Precio</label>
-        <input
-          id="precio"
-          [(ngModel)]="formulario.precio"
-          name="precio"
-          type="number"
-          min="0.01"
-          step="0.01"
-          required
-        />
-
-        <label for="stock">Stock</label>
-        <input
-          id="stock"
-          [(ngModel)]="formulario.stock"
-          name="stock"
-          type="number"
-          min="0"
-          step="1"
-          required
-        />
-
-        <label class="campo-checkbox" for="activo">
+      @if (tipo === 'crear') {
+        <form #productoForm="ngForm" (ngSubmit)="crear()">
+          <label for="nombre">Nombre</label>
           <input
-            id="activo"
-            [(ngModel)]="formulario.activo"
-            name="activo"
-            type="checkbox"
+            id="nombre"
+            [(ngModel)]="formulario.nombre"
+            name="nombre"
+            type="text"
+            maxlength="100"
+            required
           />
-          Producto activo
-        </label>
 
-        <div class="acciones-formulario">
-          <button type="submit" [disabled]="productoForm.invalid || guardando()">
-            {{ guardando() ? 'Guardando…' : 'Guardar' }}
-          </button>
-          <button
-            type="button"
-            class="boton-secundario"
-            (click)="cerrarPopup()"
-            [disabled]="guardando()"
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
+          <label for="categoria">Categoría</label>
+          <input
+            id="categoria"
+            [(ngModel)]="formulario.categoria"
+            name="categoria"
+            type="text"
+            maxlength="50"
+            placeholder="Ej: Proteína"
+            required
+          />
+
+          <label for="precio">Precio unitario</label>
+          <input
+            id="precio"
+            [(ngModel)]="formulario.precio_unitario"
+            name="precio_unitario"
+            type="number"
+            min="1"
+            step="1"
+            required
+          />
+
+          <label for="stock">Stock inicial</label>
+          <input
+            id="stock"
+            [(ngModel)]="formulario.stock"
+            name="stock"
+            type="number"
+            min="0"
+            step="1"
+            required
+          />
+
+          <div class="acciones-formulario">
+            <button type="submit" [disabled]="productoForm.invalid || guardando()">
+              {{ guardando() ? 'Guardando…' : 'Guardar' }}
+            </button>
+            <button
+              type="button"
+              class="boton-secundario"
+              (click)="cerrarPopup()"
+              [disabled]="guardando()"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      } @else {
+        <form #ventaForm="ngForm" (ngSubmit)="vender()">
+          <p>Stock disponible: {{ productoVenta?.stock }}</p>
+
+          <label for="cantidad">Cantidad</label>
+          <input
+            id="cantidad"
+            [(ngModel)]="cantidad"
+            name="cantidad"
+            type="number"
+            min="1"
+            [max]="productoVenta?.stock ?? 1"
+            step="1"
+            required
+          />
+
+          <div class="acciones-formulario">
+            <button type="submit" [disabled]="ventaForm.invalid || guardando()">
+              {{ guardando() ? 'Registrando…' : 'Registrar venta' }}
+            </button>
+            <button
+              type="button"
+              class="boton-secundario"
+              (click)="cerrarPopup()"
+              [disabled]="guardando()"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      }
     </section>
   </div>
 }
