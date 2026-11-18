@@ -1,0 +1,116 @@
+<section class="pagina">
+  <header class="pagina__header">
+    <div>
+      <h1>Clientes</h1>
+      <p>Registro de los clientes del gimnasio (HU-01).</p>
+    </div>
+    <button type="button" class="boton-principal" (click)="abrirModal()">
+      Registrar cliente
+    </button>
+  </header>
+
+  @if (mensaje()) {
+    <p class="mensaje" role="status">{{ mensaje() }}</p>
+  }
+
+  @if (clientes().length > 0) {
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Documento</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cliente of clientes(); track cliente.id) {
+            <tr>
+              <td>{{ cliente.id }}</td>
+              <td>{{ cliente.nombre }}</td>
+              <td>{{ cliente.documento }}</td>
+              <td>{{ cliente.telefono ?? '—' }}</td>
+              <td><span class="estado estado--ok">{{ cliente.estado }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="vacio">Todavía no hay clientes registrados.</p>
+  }
+</section>
+
+@if (modalAbierto()) {
+  <div class="fondo-modal" (click)="cerrarModal()">
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="titulo-modal"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal__encabezado">
+        <h2 id="titulo-modal">Registrar cliente</h2>
+        <button
+          type="button"
+          class="boton-cerrar"
+          aria-label="Cerrar"
+          [disabled]="guardando()"
+          (click)="cerrarModal()"
+        >
+          ×
+        </button>
+      </div>
+
+      @if (errorFormulario()) {
+        <p class="mensaje mensaje--error" role="alert">{{ errorFormulario() }}</p>
+      }
+
+      <form #clienteForm="ngForm" (ngSubmit)="registrar()">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" [(ngModel)]="formulario.nombre" name="nombre" maxlength="100" required />
+
+        <label for="documento">Documento</label>
+        <input
+          id="documento"
+          [(ngModel)]="formulario.documento"
+          name="documento"
+          maxlength="50"
+          required
+        />
+
+        <label for="telefono">Teléfono <span>(opcional)</span></label>
+        <input id="telefono" [(ngModel)]="formulario.telefono" name="telefono" maxlength="20" />
+
+        <label for="fecha-nacimiento">Fecha de nacimiento <span>(opcional)</span></label>
+        <input
+          id="fecha-nacimiento"
+          [(ngModel)]="formulario.fecha_nacimiento"
+          name="fecha_nacimiento"
+          type="date"
+        />
+
+        <div class="acciones-modal">
+          <button
+            type="button"
+            class="boton-secundario"
+            [disabled]="guardando()"
+            (click)="cerrarModal()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="boton-principal"
+            [disabled]="clienteForm.invalid || guardando()"
+          >
+            {{ guardando() ? 'Guardando…' : 'Guardar cliente' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}

@@ -1,0 +1,88 @@
+<section class="pagina">
+  <header class="pagina__header">
+    <div>
+      <h1>Membresías</h1>
+      <p>Consulta el estado de la membresía de un cliente y renuévala (HU-04).</p>
+    </div>
+  </header>
+
+  @if (mensaje()) {
+    <p class="mensaje" role="status">{{ mensaje() }}</p>
+  }
+  @if (error()) {
+    <p class="mensaje mensaje--error" role="alert">{{ error() }}</p>
+  }
+
+  <!-- 1. Elegir el cliente -->
+  <section class="tarjeta">
+    <h2>Cliente</h2>
+    <label for="cliente">Selecciona un cliente</label>
+    <select
+      id="cliente"
+      [ngModel]="clienteId"
+      (ngModelChange)="elegirCliente($event)"
+      [ngModelOptions]="{ standalone: true }"
+    >
+      <option [ngValue]="null">— Elegir —</option>
+      @for (cliente of clientes(); track cliente.id) {
+        <option [ngValue]="cliente.id">{{ cliente.nombre }} ({{ cliente.documento }})</option>
+      }
+    </select>
+    @if (clientes().length === 0) {
+      <p class="texto-suave">No hay clientes. Regístralos primero en la pantalla Clientes.</p>
+    }
+  </section>
+
+  @if (clienteId !== null && consultada()) {
+    <!-- 2. Membresía actual (estado calculado por el patrón State) -->
+    <section class="tarjeta">
+      <h2>Membresía actual</h2>
+      @if (membresia(); as m) {
+        <div class="dato">
+          <span>Estado</span>
+          <span
+            class="estado"
+            [class.estado--ok]="m.nombre_estado === 'Vigente'"
+            [class.estado--mal]="m.nombre_estado === 'Vencida'"
+          >
+            {{ m.nombre_estado }}
+          </span>
+        </div>
+        <div class="dato"><span>Tipo</span><strong>{{ textoTipo(m.tipo) }}</strong></div>
+        <div class="dato"><span>Desde</span><strong>{{ m.fecha_inicio }}</strong></div>
+        <div class="dato"><span>Hasta</span><strong>{{ m.fecha_fin }}</strong></div>
+        <div class="dato">
+          <span>Valor</span><strong>${{ m.valor | number: '1.0-0' }}</strong>
+        </div>
+      } @else {
+        <p class="texto-suave">Este cliente todavía no tiene membresía.</p>
+      }
+    </section>
+
+    <!-- 3. Renovar -->
+    <section class="tarjeta">
+      <h2>Renovar</h2>
+      <form (ngSubmit)="renovar()">
+        <label for="tipo">Tipo de membresía</label>
+        <select id="tipo" [(ngModel)]="tipo" name="tipo">
+          @for (t of tipos; track t.valor) {
+            <option [ngValue]="t.valor">{{ t.texto }}</option>
+          }
+        </select>
+
+        <label for="metodo-pago">Método de pago</label>
+        <select id="metodo-pago" [(ngModel)]="metodoPago" name="metodo_pago">
+          @for (metodo of metodosPago; track metodo) {
+            <option [ngValue]="metodo">{{ metodo }}</option>
+          }
+        </select>
+
+        <div class="acciones-modal">
+          <button type="submit" class="boton-principal" [disabled]="guardando()">
+            {{ guardando() ? 'Renovando…' : 'Renovar y registrar pago' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+</section>
