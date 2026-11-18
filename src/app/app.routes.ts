@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
 import { Shell } from './layout/shell/shell';
-import { Clientes } from './pages/clientes/clientes';
 import { InventarioPage } from './pages/inventario/inventario';
 import { Productos } from './pages/productos/productos';
+import { Maquinas } from './pages/maquinas/maquinas';
+import { Usuarios } from './pages/usuarios/usuarios';
 import { Vendedores } from './pages/vendedores/vendedores';
 
 export const routes: Routes = [
@@ -14,7 +15,8 @@ export const routes: Routes = [
       { path: 'vendedores', component: Vendedores },
       { path: 'productos', component: Productos },
       { path: 'inventario', component: InventarioPage },
-      { path: 'clientes', component: Clientes },
+      { path: 'maquinas', component: Maquinas },
+      { path: 'usuarios', component: Usuarios },
     ],
   },
   { path: '**', redirectTo: 'vendedores' },

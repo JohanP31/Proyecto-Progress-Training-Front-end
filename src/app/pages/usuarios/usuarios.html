@@ -1,0 +1,101 @@
+<section class="usuarios">
+  <header class="usuarios__header">
+    <div>
+      <h1>USUARIOS</h1>
+      <p>Selecciona un empleado para marcar su entrada o salida.</p>
+    </div>
+  </header>
+
+  @if (mensaje()) {
+    <p class="mensaje mensaje--error" role="alert">{{ mensaje() }}</p>
+  }
+
+  @if (cargando()) {
+    <p class="estado-vacio" role="status">Cargando empleados…</p>
+  } @else if (empleados().length === 0 && !mensaje()) {
+    <p class="estado-vacio">No hay empleados disponibles para marcar asistencia.</p>
+  } @else {
+    <div class="empleados">
+      @for (empleado of empleados(); track empleado.id) {
+        @let turno = asistenciaActiva(empleado.id);
+        <article class="tarjeta-empleado">
+          <header class="tarjeta-empleado__encabezado">
+            <div class="tarjeta-empleado__identidad">
+              <h2>{{ empleado.nombre }}</h2>
+              <p>
+                {{ empleado.cargo || 'Empleado' }}
+                <span>·</span>
+                ID {{ empleado.id }}
+              </p>
+            </div>
+            @if (turno) {
+              <span class="estado estado--activo">Turno activo</span>
+            } @else {
+              <span class="estado estado--inactivo">Fuera de turno</span>
+            }
+          </header>
+
+          <div class="tarjeta-empleado__acciones">
+            <button
+              type="button"
+              class="boton-turno"
+              [class.boton-turno--activo]="turno"
+              [disabled]="asistenciaCargando(empleado.id) || empleadoGuardando(empleado.id)"
+              (click)="marcarAsistencia(empleado.id)"
+            >
+              {{
+                empleadoGuardando(empleado.id)
+                  ? 'Guardando…'
+                  : turno
+                    ? 'Salir de puesto'
+                    : 'Marcar entrada'
+              }}
+            </button>
+            @if (turno) {
+              <div class="turno-activo__tiempo" aria-live="polite">
+                <span>TIEMPO EN TURNO</span>
+                <strong>{{ tiempoActivo(turno) }}</strong>
+              </div>
+            }
+          </div>
+
+          @if (mensajesPorEmpleado()[empleado.id]) {
+            <p class="mensaje" role="status">{{ mensajesPorEmpleado()[empleado.id] }}</p>
+          }
+
+          <section class="historial" [attr.aria-label]="'Asistencias de ' + empleado.nombre">
+            <h3>Registro de asistencia</h3>
+            @if (asistenciaCargando(empleado.id)) {
+              <p class="historial__vacio" role="status">Cargando registros…</p>
+            } @else if ((asistencias()[empleado.id] ?? []).length > 0) {
+              <div class="registros">
+                @for (asistencia of asistencias()[empleado.id]; track asistencia.id) {
+                  <div class="registro">
+                    <div>
+                      <span class="dato-label">FECHA</span>
+                      <strong>{{ fecha(asistencia.fecha_entrada) }}</strong>
+                    </div>
+                    <div>
+                      <span class="dato-label">HORA INGRESO</span>
+                      <strong>{{ hora(asistencia.fecha_entrada) }}</strong>
+                    </div>
+                    <div>
+                      <span class="dato-label">HORA SALIDA</span>
+                      <strong>{{ hora(asistencia.fecha_salida) }}</strong>
+                    </div>
+                    <div>
+                      <span class="dato-label">HORAS TRABAJADAS</span>
+                      <strong>{{ duracion(asistencia) }}</strong>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else if (!mensajesPorEmpleado()[empleado.id]) {
+              <p class="historial__vacio">No hay registros para este empleado.</p>
+            }
+          </section>
+        </article>
+      }
+    </div>
+  }
+</section>

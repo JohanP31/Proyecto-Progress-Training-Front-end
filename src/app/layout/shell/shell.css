@@ -1,6 +1,10 @@
 :host {
-  display: block;
-  flex: 0 0 16rem;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  color: #fff;
+  background: #222;
 }
 
 .app-sidebar {
@@ -16,6 +20,39 @@
   color: #e5e7eb;
   background: #232323;
   border-right: 1px solid #303030;
+}
+
+.app-shell__content {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+@media (max-width: 720px) {
+  :host {
+    flex-direction: column;
+  }
+
+  .app-sidebar {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    position: relative;
+  }
+
+  .app-sidebar__footer {
+    display: none;
+  }
+
+  .app-sidebar__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0;
+  }
+
+  .app-sidebar__link {
+    padding: 0.75rem 1rem;
+  }
 }
 
 .app-sidebar__brand {

@@ -1,0 +1,213 @@
+<section class="maquinas">
+  <header class="maquinas__header">
+    <div>
+      <h1>Máquinas</h1>
+      <p>Registro de máquinas disponibles, dañadas o en mantenimiento.</p>
+    </div>
+    <button type="button" class="boton-crear" (click)="abrirCrear()">
+      Añadir máquina
+    </button>
+  </header>
+
+  @if (mensaje()) {
+    <p class="mensaje" role="status">{{ mensaje() }}</p>
+  }
+
+  @for (estado of estados; track estado) {
+    <section class="grupo-maquinas" [attr.aria-label]="estado">
+      <h2>
+        {{ estado === 'Disponible' ? 'Disponibles' : estado === 'Dañada' ? 'Dañadas' : 'En mantenimiento' }}
+      </h2>
+
+      <div class="maquinas__grid">
+        @for (maquina of maquinasPorEstado(estado); track maquina.id) {
+          <article class="tarjeta-maquina">
+            <div class="tarjeta-maquina__encabezado">
+              <h3>{{ maquina.nombre }}</h3>
+              <span class="estado" [class]="'estado estado--' + (estado === 'En mantenimiento' ? 'mantenimiento' : estado === 'Dañada' ? 'danada' : 'disponible')">
+                {{ maquina.estado }}
+              </span>
+            </div>
+
+            @if (maquina.fecha_adquisicion) {
+              <p class="fecha-adquisicion">
+                Adquirida: {{ maquina.fecha_adquisicion }}
+              </p>
+            }
+
+            <label class="campo-estado" [for]="'estado-' + maquina.id">Cambiar estado</label>
+            <select
+              [id]="'estado-' + maquina.id"
+              [ngModel]="maquina.estado"
+              [ngModelOptions]="{ standalone: true }"
+              [disabled]="actualizandoId() !== null"
+              (ngModelChange)="actualizarEstado(maquina, $event)"
+            >
+              @for (opcion of estados; track opcion) {
+                <option [ngValue]="opcion">{{ opcion }}</option>
+              }
+            </select>
+
+            <button
+              type="button"
+              class="boton-mantenimiento"
+              (click)="abrirMantenimiento(maquina)"
+            >
+              Registrar mantenimiento
+            </button>
+
+            @if (maquina.mantenimientos.length > 0) {
+              <details class="historial">
+                <summary>Historial de mantenimientos ({{ maquina.mantenimientos.length }})</summary>
+                @for (mantenimiento of maquina.mantenimientos; track mantenimiento.id) {
+                  <div class="historial__item">
+                    <strong>{{ mantenimiento.descripcion }}</strong>
+                    <span>{{ mantenimiento.fecha }} · {{ mantenimiento.estado }}</span>
+                    <span>Costo: {{ mantenimiento.costo | number: '1.0-2' }}</span>
+                  </div>
+                }
+              </details>
+            } @else {
+              <p class="sin-historial">Sin mantenimientos registrados.</p>
+            }
+          </article>
+        } @empty {
+          <p class="sin-maquinas">No hay máquinas en este estado.</p>
+        }
+      </div>
+    </section>
+  }
+</section>
+
+@if (modal(); as tipoModal) {
+  <div class="fondo-modal" (click)="cerrarModal()">
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="titulo-modal"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal__encabezado">
+        <h2 id="titulo-modal">
+          {{ tipoModal === 'crear' ? 'Añadir nueva máquina' : 'Registrar mantenimiento' }}
+        </h2>
+        <button
+          type="button"
+          class="boton-cerrar"
+          aria-label="Cerrar"
+          [disabled]="guardando()"
+          (click)="cerrarModal()"
+        >
+          ×
+        </button>
+      </div>
+
+      @if (tipoModal === 'mantenimiento' && maquinaSeleccionada) {
+        <p class="modal__subtitulo">{{ maquinaSeleccionada.nombre }}</p>
+      }
+
+      @if (errorFormulario()) {
+        <p class="mensaje mensaje--error" role="alert">{{ errorFormulario() }}</p>
+      }
+
+      @if (tipoModal === 'crear') {
+        <form #maquinaForm="ngForm" (ngSubmit)="crearMaquina()">
+          <label for="nombre-maquina">Nombre de la máquina</label>
+          <input
+            id="nombre-maquina"
+            [(ngModel)]="formularioMaquina.nombre"
+            name="nombre"
+            type="text"
+            maxlength="100"
+            required
+          />
+
+          <label for="estado-inicial">Estado inicial</label>
+          <select
+            id="estado-inicial"
+            [(ngModel)]="formularioMaquina.estado"
+            name="estado"
+            required
+          >
+            @for (estado of estados; track estado) {
+              <option [ngValue]="estado">{{ estado }}</option>
+            }
+          </select>
+
+          <label for="fecha-adquisicion">Fecha de adquisición <span>(opcional)</span></label>
+          <input
+            id="fecha-adquisicion"
+            [(ngModel)]="formularioMaquina.fecha_adquisicion"
+            name="fecha_adquisicion"
+            type="date"
+          />
+
+          <div class="acciones-modal">
+            <button type="button" class="boton-secundario" [disabled]="guardando()" (click)="cerrarModal()">
+              Cancelar
+            </button>
+            <button type="submit" class="boton-guardar" [disabled]="maquinaForm.invalid || guardando()">
+              {{ guardando() ? 'Guardando…' : 'Guardar máquina' }}
+            </button>
+          </div>
+        </form>
+      } @else {
+        <form #mantenimientoForm="ngForm" (ngSubmit)="registrarMantenimiento()">
+          <label for="fecha-mantenimiento">Fecha</label>
+          <input
+            id="fecha-mantenimiento"
+            [(ngModel)]="formularioMantenimiento.fecha"
+            name="fecha"
+            type="date"
+            required
+          />
+
+          <label for="descripcion-mantenimiento">Descripción</label>
+          <textarea
+            id="descripcion-mantenimiento"
+            [(ngModel)]="formularioMantenimiento.descripcion"
+            name="descripcion"
+            maxlength="255"
+            rows="3"
+            required
+          ></textarea>
+
+          <label for="costo-mantenimiento">Costo</label>
+          <input
+            id="costo-mantenimiento"
+            [(ngModel)]="formularioMantenimiento.costo"
+            name="costo"
+            type="number"
+            min="0"
+            step="0.01"
+            required
+          />
+
+          <label for="estado-mantenimiento">Estado del mantenimiento</label>
+          <input
+            id="estado-mantenimiento"
+            [(ngModel)]="formularioMantenimiento.estado"
+            name="estado"
+            type="text"
+            maxlength="50"
+            required
+          />
+
+          <div class="acciones-modal">
+            <button type="button" class="boton-secundario" [disabled]="guardando()" (click)="cerrarModal()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="boton-guardar"
+              [disabled]="mantenimientoForm.invalid || guardando()"
+            >
+              {{ guardando() ? 'Guardando…' : 'Guardar mantenimiento' }}
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+  </div>
+}

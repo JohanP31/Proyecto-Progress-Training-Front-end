@@ -1,0 +1,226 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.usuarios {
+  box-sizing: border-box;
+  display: grid;
+  gap: 1.5rem;
+  min-height: 100vh;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  color: #e5e7eb;
+  background: #202020;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.usuarios__header h1,
+.usuarios__header p,
+.tarjeta-empleado__identidad h2,
+.tarjeta-empleado__identidad p,
+.historial h3 {
+  margin: 0;
+}
+
+.usuarios__header h1 {
+  color: #fff;
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 3.25rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.usuarios__header p,
+.tarjeta-empleado__identidad p {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.usuarios__header p {
+  margin-top: 0.5rem;
+}
+
+.empleados {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.tarjeta-empleado {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid #383838;
+  border-radius: 0.25rem;
+  background: #282828;
+}
+
+.tarjeta-empleado__encabezado,
+.tarjeta-empleado__acciones {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.tarjeta-empleado__identidad {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.tarjeta-empleado__identidad h2 {
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+.tarjeta-empleado__identidad p span {
+  padding: 0 0.25rem;
+}
+
+.estado {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  white-space: nowrap;
+}
+
+.estado--activo {
+  background: rgb(212 255 0 / 12%);
+  color: #d4ff00;
+}
+
+.estado--inactivo {
+  background: rgb(156 163 175 / 12%);
+  color: #d1d5db;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.boton-turno {
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  color: #111;
+  background: #d4ff00;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.boton-turno:hover:not(:disabled) {
+  background: #bce400;
+}
+
+.boton-turno--activo,
+.boton-turno--activo:hover:not(:disabled) {
+  color: #fff;
+  background: #dc2626;
+}
+
+.turno-activo__tiempo {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  color: #d4ff00;
+  font-family: monospace;
+}
+
+.turno-activo__tiempo span,
+.dato-label {
+  color: #9ca3af;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.turno-activo__tiempo strong {
+  font-size: 1rem;
+}
+
+.historial {
+  display: grid;
+  gap: 0.75rem;
+  border-top: 1px solid #404040;
+  padding-top: 1rem;
+}
+
+.historial h3 {
+  color: #fff;
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.registros {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.registro {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  padding: 0.875rem 0;
+  border-bottom: 1px solid rgb(156 163 175 / 25%);
+}
+
+.registro > div {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.registro strong {
+  color: #fff;
+  font-size: 0.9375rem;
+}
+
+.mensaje {
+  background: #29320c;
+  border: 1px solid #50620b;
+  border-radius: 0.375rem;
+  color: #e5f5a1;
+  margin: 0;
+  padding: 0.75rem 1rem;
+}
+
+.mensaje--error {
+  background: #3b1717;
+  border-color: #7f2929;
+  color: #fecaca;
+}
+
+.estado-vacio,
+.historial__vacio {
+  background: #282828;
+  border: 1px dashed #484848;
+  border-radius: 0.375rem;
+  color: #9ca3af;
+  margin: 0;
+  padding: 1.25rem;
+}
+
+.historial__vacio {
+  padding: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .tarjeta-empleado__acciones {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .boton-turno {
+    width: 100%;
+  }
+}

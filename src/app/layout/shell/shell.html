@@ -18,8 +18,11 @@
       <a routerLink="/inventario" routerLinkActive="is-active" class="app-sidebar__link">
         INVENTARIO
       </a>
-      <a routerLink="/clientes" routerLinkActive="is-active" class="app-sidebar__link">
-        CLIENTES
+      <a routerLink="/usuarios" routerLinkActive="is-active" class="app-sidebar__link">
+        USUARIOS
+      </a>
+      <a routerLink="/maquinas" routerLinkActive="is-active" class="app-sidebar__link">
+        MÁQUINAS
       </a>
     </nav>
   </div>
@@ -32,3 +35,6 @@
     </button>
   </div>
 </aside>
+<main class="app-shell__content">
+  <router-outlet />
+</main>

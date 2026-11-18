@@ -5,8 +5,10 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 ## Cómo ejecutar el frontend en local
 
 Frontend Angular (sidebar + CRUD por entidad) que consume la API del curso.
-Entidades: **Vendedores**, **Productos** y **Clientes** (`/clientes`: GET lista, GET por id,
-POST, PUT y DELETE).
+Entidades: **Vendedores**, **Productos**, **Inventario**, **Usuarios** y **Máquinas**. La pantalla
+de máquinas (`/maquinas`) permite consultar y crear máquinas, cambiar su estado y registrar
+mantenimientos. **Usuarios** (`/usuarios`) lista los empleados de la API, consulta su historial
+de asistencia y permite marcar la entrada o salida individualmente.
 
 **URL base del backend:** `http://127.0.0.1:8000`
 (se configura en un solo lugar: `src/environments/environment.ts`, campo `apiUrl`).
@@ -37,7 +39,7 @@ POST, PUT y DELETE).
    npm start
    ```
 
-4. Abrir `http://localhost:4200/` y entrar a **Productos** en el menú lateral.
+4. Abrir `http://localhost:4200/` y elegir una sección en el menú lateral.
 
 Si la API no está encendida, la pantalla muestra
 "No hubo conexión con el servidor" y no se muestran datos.
